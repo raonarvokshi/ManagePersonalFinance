@@ -27,8 +27,6 @@ def view_report():
                 "Category (optional)", placeholder="Category (optional)", max_chars=50)
 
         apply_filters = st.button("Apply Filters") if select_filters else None
-        # Butoni për shkarkim PDF
-        download_pdf = st.button("Download PDF Report")
 
     expenses_response = requests.get(
         f"{BASE_URL}/expenses/", params={"user_id": st.session_state.user_id})
@@ -137,7 +135,6 @@ def view_report():
                 charts["income_time_chart"] = temp_file
                 temp_files.append(temp_file)
 
-            if download_pdf:
                 pdf = FPDF()
                 pdf.add_page()
                 pdf.set_font("Arial", size=12)
@@ -161,17 +158,17 @@ def view_report():
 
                 pdf_output = BytesIO()
                 pdf_output.write(pdf.output(dest="S").encode(
-                    "latin1"))  # Kalon përmbajtjen si bytes
+                    "latin1"))
                 pdf_output.seek(0)
 
-                st.download_button(
-                    label="Download PDF",
-                    data=pdf_output,
-                    file_name="financial_report.pdf",
-                    mime="application/pdf"
-                )
+                with st.sidebar:
+                    st.download_button(
+                        label="Download Report as PDF",
+                        data=pdf_output,
+                        file_name="financial_report.pdf",
+                        mime="application/pdf"
+                    )
 
-                # Fshij skedarët e përkohshëm pas përdorimit
                 for temp_file in temp_files:
                     os.remove(temp_file)
 
